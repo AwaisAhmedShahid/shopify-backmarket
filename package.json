@@ -1,0 +1,48 @@
+{
+  "name": "shopify-backmarket",
+  "version": "1.0.0",
+  "description": "A Node.js/TypeScript application to synchronize orders, inventory, and order statuses between Shopify and BackMarket. Built for low-cost hosting and reliability.",
+  "keywords": [
+    "Shopify",
+    "BackMarket",
+    "node"
+  ],
+  "homepage": "https://github.com/AwaisAhmedShahid/shopify-backmarket#readme",
+  "bugs": {
+    "url": "https://github.com/AwaisAhmedShahid/shopify-backmarket/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AwaisAhmedShahid/shopify-backmarket.git"
+  },
+  "license": "ISC",
+  "author": "Awais Ahmed Shahid",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon src/index.ts",
+    "dev": "ts-node src/index.ts",
+    "build": "rimraf dist && tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@shopify/shopify-api": "^11.8.1",
+    "axios": "^1.7.9",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongoose": "^8.10.0",
+    "node-cron": "^3.0.3",
+    "nodemon": "^3.1.9",
+    "reflect-metadata": "^0.2.2",
+    "sqlite3": "^5.1.7",
+    "typeorm": "^0.3.20",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.13.1",
+    "@types/node-cron": "^3.0.11",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  }
+}

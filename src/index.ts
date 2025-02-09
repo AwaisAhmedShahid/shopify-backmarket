@@ -16,7 +16,7 @@ const syncManager = new SyncManager();
 syncManager.startSync();
 
 // Health check endpoint with sync status
-app.get('/health', (req, res) => {
+app.get('/', (req, res) => {
     const store = MemoryStore.getInstance();
     const failedImports = store.getFailedImports();
 

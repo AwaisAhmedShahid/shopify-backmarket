@@ -21,21 +21,17 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon src/index.ts",
-    "dev": "ts-node src/index.ts",
+    "dev": "nodemon src/index.ts",
     "build": "rimraf dist && tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@shopify/shopify-api": "^11.8.1",
     "axios": "^1.7.9",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "mongoose": "^8.10.0",
     "node-cron": "^3.0.3",
     "nodemon": "^3.1.9",
-    "reflect-metadata": "^0.2.2",
-    "sqlite3": "^5.1.7",
-    "typeorm": "^0.3.20",
+    "shopify-api-node": "^3.14.1",
     "winston": "^3.17.0"
   },
   "devDependencies": {

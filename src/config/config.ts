@@ -1,10 +1,12 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 export const config = {
     shopify: {
         shopName: process.env.SHOPIFY_SHOP_NAME || '',
         apiKey: process.env.SHOPIFY_API_KEY || '',
         secret: process.env.SHOPIFY_API_SECRET || '',
         accessToken: process.env.SHOPIFY_ACCESS_TOKEN || '',
-        apiVersion: '2023-07',
         pollInterval: 5 * 60 * 1000, // 5 minutes
     },
     backmarket: {

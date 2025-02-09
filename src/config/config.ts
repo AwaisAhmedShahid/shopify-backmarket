@@ -1,14 +1,16 @@
 export const config = {
     shopify: {
-        apiKey: process.env.SHOPIFY_API_KEY || '',
-        password: process.env.SHOPIFY_PASSWORD || '',
         shopName: process.env.SHOPIFY_SHOP_NAME || '',
+        apiKey: process.env.SHOPIFY_API_KEY || '',
+        secret: process.env.SHOPIFY_API_SECRET || '',
+        accessToken: process.env.SHOPIFY_ACCESS_TOKEN || '',
         apiVersion: '2023-07',
         pollInterval: 5 * 60 * 1000, // 5 minutes
     },
     backmarket: {
         apiKey: process.env.BACKMARKET_API_KEY || '',
-        apiSecret: process.env.BACKMARKET_API_SECRET || '',
+        password: process.env.BACKMARKET_PASSWORD || '',
+        userName: process.env.BACKMARKET_USERNAME || '',
         baseUrl: process.env.BACKMARKET_API_URL || 'https://api.backmarket.com',
         pollInterval: 5 * 60 * 1000, // 5 minutes
     },
@@ -18,3 +20,10 @@ export const config = {
         port: 8000,
     }
 };
+
+export const BACKMARKET_HEADERS = {
+    Authorization: `Basic ${process.env.BACKMARKET_API_KEY}`,
+    Accept: 'application/json',
+    'Accept-Language': 'fr-fr',
+    'Content-Type': 'application/json',
+  };

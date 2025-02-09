@@ -5,7 +5,7 @@ export interface OrderItem {
 }
 
 export interface Order {
-    id: string;
+    id: number;
     platformId: string;
     platform: 'shopify' | 'backmarket';
     status: 'new' | 'processing' | 'shipped' | 'cancelled';

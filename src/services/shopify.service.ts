@@ -23,6 +23,13 @@ export class ShopifyService {
     return ShopifyService.instance;
   }
 
+  async getProducts(): Promise<any> {
+    return withRetry(async () => {
+      await shopifyRateLimiter.waitForToken("shopify-api");
+      return this.shopify.product.list();
+    }, "Fetching Shopify products");
+  }
+
   async getNewOrders(since: Date): Promise<Order[]> {
     return withRetry(async () => {
       await shopifyRateLimiter.waitForToken("shopify-api");
@@ -30,6 +37,7 @@ export class ShopifyService {
         created_at_min: since.toISOString(),
         status: "any",
       });
+      console.log('🚀 ~ ShopifyService ~ returnwithRetry ~ orders:', orders);
 
       return orders.map(this.mapShopifyOrder);
     }, "Fetching Shopify orders");

@@ -4,9 +4,7 @@ import { BackMarketService } from "../services/backmarket.service";
 import { MemoryStore } from "../storage/memory-store";
 import { SkuMapper } from "../utils/sku-mapper";
 import logger from "../utils/logger";
-import { config } from "../config/config";
 import { Order } from "../models/order.model";
-import axios from "axios";
 
 export class SyncManager {
   private shopifyService: ShopifyService;
@@ -21,11 +19,10 @@ export class SyncManager {
     this.lastSyncTime = new Date();
   }
   startSync(): void {
-    logger.info("Starting sync service");
     this.syncOrders();
     cron.schedule("*/5 * * * *", () => {
+      logger.info("Executing order sync...");
       this.syncOrders();
-      console.log("Executing order sync...");
     });
   }
 

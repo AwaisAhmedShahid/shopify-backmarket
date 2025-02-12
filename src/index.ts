@@ -4,26 +4,12 @@ import express from "express";
 import { SyncManager } from "./jobs/sync-manager";
 import logger from "./utils/logger";
 import { MemoryStore } from "./storage/memory-store";
-import { ShopifyService } from "./services/shopify.service";
-import { BackMarketService } from "./services/backmarket.service";
+import { SyncInventory } from "./jobs/sync-inventory";
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
-
-// const shopifyService = ShopifyService.getInstance();
-// const backMarketService = BackMarketService.getInstance();
-// const testManager = async () => {
-//   // date one year ago
-//   const oldDate = new Date();
-//   oldDate.setFullYear(oldDate.getFullYear() - 2);
-//   console.log("🚀 ~ testManager ~ oldDate:", oldDate);
-//   const a = await backMarketService.getNewOrders(oldDate);
-//   console.log("🚀 ~ a:", a);
-// };
-// testManager();
-
 
 // Initialize sync manager
 const syncManager = new SyncManager();
@@ -44,8 +30,15 @@ app.get("/", (req, res) => {
 });
 
 // Sync Inventory
-app.post("/inventory", (req, res) => {
-  res.status(200).json({});
+app.post("/inventory/hook", async (req, res) => {
+  const syncInventory = new SyncInventory();
+  const hookData: any = req.body;
+  logger.info("🚀 ~ inventory Hook called");
+
+  const result = await syncInventory.updateProductOnHook({
+    ...hookData,
+  });
+  res.status(200).json({ result: result });
 });
 
 // Start server

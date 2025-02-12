@@ -4,7 +4,10 @@ import { Order } from "../models/order.model";
 import logger from "../utils/logger";
 import { backMarketRateLimiter } from "../utils/rate-limiter";
 import { withRetry } from "../utils/retry";
-import { getSimplifiedOrderlineStatus, getSimplifiedOrderStatus } from "../utils/order-mappers";
+import {
+  getSimplifiedOrderlineStatus,
+  getSimplifiedOrderStatus,
+} from "../utils/order-mappers";
 import { BackmarketOrder } from "../Types";
 
 export class BackMarketService {
@@ -31,14 +34,10 @@ export class BackMarketService {
         `${this.baseUrl}/ws/orders?created_after=${since.toISOString()}`,
         { headers: this.headers }
       );
-      if (response.statusText !== "OK") {
-        logger.error(
-          `Error fetching BackMarket orders: ${response.statusText}`
-        );
-        throw new Error(
-          `Error fetching BackMarket orders: ${response.statusText}`
-        );
+      if (!response) {
+        logger.error(`Error fetching BackMarket orders`);
       }
+      console.log('🚀 ~ BackMarketService ~ returnwithRetry ~ response:', response.data.id);
       return response.data.results.map(this.mapBackMarketOrder);
     }, "Fetching BackMarket orders");
   }
@@ -86,5 +85,50 @@ export class BackMarketService {
       createdAt: new Date(backMarketOrder.date_creation),
       updatedAt: new Date(backMarketOrder.date_modification),
     };
+  }
+
+  async getProductsBySKU(sku: string): Promise<any> {
+    return withRetry(async () => {
+      await backMarketRateLimiter.waitForToken("backmarket-api");
+      const response = await axios.get(`${this.baseUrl}/bm/catalog/listings`, {
+        headers: this.headers,
+        params: { sku },
+      });
+      if (!response) {
+        logger.error(`Error fetching BackMarket products`);
+      }
+      return response.data.results;
+    }, "Fetching BackMarket products");
+  }
+
+  async updateProductInventoryById(
+    productId: string | number,
+    productQuantity: number,
+    updatedQuantity: number
+  ): Promise<any> {
+    return withRetry(async () => {
+      await backMarketRateLimiter.waitForToken("backmarket-api");
+      if (productQuantity === updatedQuantity) {
+        logger.info(` ${productId} Quantity already updated`);
+        return {
+          productId,
+          updated: false,
+          message: `${productId} Quantity already updated`,
+        };
+      }
+      const response = await axios.post(
+        `${this.baseUrl}/ws/listings/${productId}`,
+        { quantity: updatedQuantity },
+        { headers: this.headers }
+      );
+      if (!response) {
+        logger.error(`Error updating BackMarket inventory`);
+      }
+      return {
+        id: response.data.id,
+        updated: true,
+        quantity: response.data.quantity,
+      };
+    }, "Updating BackMarket inventory");
   }
 }

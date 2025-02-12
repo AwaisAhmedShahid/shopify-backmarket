@@ -17,7 +17,7 @@ export const config = {
         baseUrl: process.env.BACKMARKET_API_URL || 'https://preprod.backmarket.fr',
         pollInterval: 5 * 60 * 1000, // 5 minutes
     },
-    retryAttempts: 3,
+    retryAttempts: 1,
     retryDelay: 1000, // 1 second
     server: {
         port: 8000,

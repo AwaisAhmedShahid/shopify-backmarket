@@ -20,12 +20,10 @@ export class SkuMapper {
   }
 
   static backMarketToShopifySKU(backMarketSku: string): string {
-  console.log('🚀 ~ SkuMapper ~ backMarketToShopify ~ backMarketSku:', backMarketSku);
-
     // Extract base SKU before the first slash
     if (!backMarketSku?.includes("/")) {
-    return backMarketSku.split("/")[0];
+      return backMarketSku.split("/")[0];
     }
-    return ""
+    return "";
   }
 }

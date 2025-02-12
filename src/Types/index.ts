@@ -1,6 +1,20 @@
 import { IOrderLineItem } from "shopify-api-node";
 
 // *************************** BackMarket *****************************
+
+export interface BackMarketProduct {
+  id: number;
+  bmId: number;
+  productId: string;
+  title: string;
+  thumbnail: any;
+  markets: any[];
+  categoryId: number;
+  isPublicationStateComputing: boolean;
+  quantity: number;
+  sku: string;
+}
+
 interface BackMarketOrdersAddress {
   company: string;
   first_name: string;
@@ -16,7 +30,6 @@ interface BackMarketOrdersAddress {
   email: string;
   customer_id_number: string;
 }
-
 
 interface BackMarketOrderLine {
   id: number;

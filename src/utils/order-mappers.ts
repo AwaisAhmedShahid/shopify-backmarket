@@ -15,7 +15,7 @@ export function getSimplifiedOrderStatus(state: number): SimplifiedOrderStatus {
     case 9:
       return "shipped";
     default:
-      throw new Error(`Unknown order state: ${state}`);
+      return "new";
   }
 }
 
@@ -38,7 +38,7 @@ export function getSimplifiedOrderlineStatus(
     case 7:
       return "cancelled";
     default:
-      throw new Error(`Unknown orderline state: ${state}`);
+      return "new";
   }
 }
 
@@ -59,7 +59,7 @@ export function mapShopifyFulfillmentStatusToSimplified(
     case "UNFULFILLED":
       return "new";
     default:
-      throw new Error(`Unknown Shopify fulfillment status: ${shopifyStatus}`);
+      return "new";
   }
 }
 

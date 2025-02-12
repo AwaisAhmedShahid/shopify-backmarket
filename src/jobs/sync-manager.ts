@@ -20,7 +20,7 @@ export class SyncManager {
   }
   startSync(): void {
     this.syncOrders();
-    cron.schedule("*/5 * * * *", () => {
+    cron.schedule("*/15 * * * *", () => {
       logger.info("Executing order sync...");
       this.syncOrders();
     });
@@ -33,9 +33,11 @@ export class SyncManager {
   private async syncOrders(): Promise<void> {
     logger.info("Starting orders sync");
     try {
-      const [shopifyOrders, backMarketOrders = []] = await Promise.all([
-        this.shopifyService.getNewOrders(this.lastSyncTime),
+      const [backMarketOrders = []] = await Promise.all([
         this.backMarketService.getNewOrders(this.lastSyncTime),
+      ]);
+      const [shopifyOrders = []] = await Promise.all([
+        this.shopifyService.getNewOrders(this.lastSyncTime),
       ]);
 
       for (const order of shopifyOrders) {
@@ -109,7 +111,7 @@ export class SyncManager {
     try {
       const mappedItems = order.items.map((item) => ({
         ...item,
-        shopifySku: SkuMapper.backMarketToShopifySKU(item.sku),
+        sku: SkuMapper.backMarketToShopifySKU(item.sku),
       }));
 
       if (order.status === "shipped" && order.trackingNumber) {

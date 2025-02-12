@@ -37,7 +37,10 @@ export class BackMarketService {
       if (!response) {
         logger.error(`Error fetching BackMarket orders`);
       }
-      console.log('🚀 ~ BackMarketService ~ returnwithRetry ~ response:', response.data.id);
+      console.log(
+        "🚀 ~ BackMarketService ~ returnwithRetry ~ response:",
+        response.data?.results.map((order:any) => order.order_id)
+      );
       return response.data.results.map(this.mapBackMarketOrder);
     }, "Fetching BackMarket orders");
   }

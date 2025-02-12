@@ -58,7 +58,7 @@ interface BackMarketOrderLine {
 }
 
 export interface BackmarketOrder {
-  order_id: string;
+  order_id: string|number|any;
   shipping_address: BackMarketOrdersAddress;
   billing_address: BackMarketOrdersAddress;
   delivery_note: string | null;

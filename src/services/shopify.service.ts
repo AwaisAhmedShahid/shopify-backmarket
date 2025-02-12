@@ -37,10 +37,19 @@ export class ShopifyService {
         created_at_min: since.toISOString(),
         status: "any",
       });
-      console.log('🚀 ~ ShopifyService ~ returnwithRetry ~ orders:', orders);
+      console.log("🚀 ~ ShopifyService ~ returnwithRetry ~ orders:", orders);
+
+      if (orders.length === 0) return [];
 
       return orders.map(this.mapShopifyOrder);
     }, "Fetching Shopify orders");
+  }
+
+  async createOrder(order: Order): Promise<void> {
+    return withRetry(async () => {
+      await shopifyRateLimiter.waitForToken("shopify-api");
+      await this.shopify.order.create(order);
+    }, `Creating Shopify order ${order.id}`);
   }
 
   async updateOrderStatus(

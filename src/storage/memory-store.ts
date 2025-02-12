@@ -3,9 +3,9 @@ import { InventoryItem } from "../models/inventory.model";
 
 export class MemoryStore {
   private static instance: MemoryStore;
-  private orders: Map<number, Order>;
+  private orders: Map<string, Order>;
   private inventory: Map<string, InventoryItem>;
-  private failedImports: Set<string | number>;
+  private failedImports: Set<string>;
 
   private constructor() {
     this.orders = new Map();
@@ -25,7 +25,7 @@ export class MemoryStore {
     this.orders.set(order.id, order);
   }
 
-  getOrder(id: number): Order | undefined {
+  getOrder(id: string): Order | undefined {
     return this.orders.get(id);
   }
 
@@ -43,15 +43,15 @@ export class MemoryStore {
   }
 
   // Failed imports tracking
-  addFailedImport(orderId: number): void {
+  addFailedImport(orderId: string): void {
     this.failedImports.add(orderId);
   }
 
-  removeFailedImport(orderId: number): void {
+  removeFailedImport(orderId: string): void {
     this.failedImports.delete(orderId);
   }
 
-  getFailedImports(): (string | number)[] {
+  getFailedImports(): string[] {
     return Array.from(this.failedImports);
   }
 }

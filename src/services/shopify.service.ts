@@ -1,4 +1,4 @@
-import Shopify from "shopify-api-node";
+import Shopify, { IOrder } from "shopify-api-node";
 import { config } from "../config/config";
 import { Order } from "../models/order.model";
 import logger from "../utils/logger";
@@ -36,7 +36,7 @@ export class ShopifyService {
   }
 
   async updateOrderStatus(
-    orderId: number,
+    orderId: string,
     status: string,
     trackingNumber?: string
   ): Promise<void> {
@@ -48,56 +48,26 @@ export class ShopifyService {
         fulfillment.tracking_number = trackingNumber;
       }
 
-      await this.shopify.order.update(orderId, fulfillment);
+      await this.shopify.order.update(Number(orderId), fulfillment);
     }, `Updating Shopify order ${orderId}`);
   }
 
-  async updateInventory(sku: string, quantity: number): Promise<void> {
-    return withRetry(async () => {
-      await shopifyRateLimiter.waitForToken("shopify-api");
-      const inventoryItem = await this.getInventoryItemBySku(sku);
-      if (inventoryItem) {
-        await this.shopify.inventoryLevel.set({
-          inventory_item_id: inventoryItem.id,
-          available: quantity,
-        });
-      }
-    }, `Updating Shopify inventory for SKU ${sku}`);
-  }
-
-  private async getInventoryItemBySku(sku: string): Promise<any> {
-    await shopifyRateLimiter.waitForToken("shopify-api");
-    const variants = await this.shopify.inventoryItem.list({ sku });
-
-    if (!variants.length) {
-      logger.warn(`No inventory found for SKU: ${sku}`);
-      return null;
-    }
-
-    const inventoryItemId = variants[0].id;
-    if (!inventoryItemId) {
-      logger.warn(`No inventory item ID found for SKU: ${sku}`);
-      return null;
-    }
-
-    return await this.shopify.inventoryItem.get(inventoryItemId);
-  }
-
-  private mapShopifyOrder(shopifyOrder: any): Order {
+  private mapShopifyOrder(shopifyOrder: IOrder): Order {
     return {
       id: shopifyOrder.id.toString(),
-      platformId: shopifyOrder.order_number.toString(),
+      platformId: shopifyOrder.id.toString(),
       platform: "shopify",
       status: this.mapOrderStatus(shopifyOrder.fulfillment_status),
       items: shopifyOrder.line_items.map((item: any) => ({
         sku: item.sku,
         quantity: item.quantity,
         price: parseFloat(item.price),
+        status: this.mapOrderStatus(item.fulfillment_status),
       })),
       trackingNumber: this.extractTrackingNumber(shopifyOrder),
       customerEmail: shopifyOrder.email,
       shippingAddress: {
-        name: shopifyOrder.shipping_address?.name || "",
+        name: shopifyOrder?.name || "",
         address1: shopifyOrder.shipping_address?.address1 || "",
         address2: shopifyOrder.shipping_address?.address2 || "",
         city: shopifyOrder.shipping_address?.city || "",

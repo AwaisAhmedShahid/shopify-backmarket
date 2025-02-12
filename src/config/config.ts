@@ -11,6 +11,7 @@ export const config = {
     },
     backmarket: {
         apiKey: process.env.BACKMARKET_API_KEY || '',
+        credentials: Buffer.from(`${process.env.BACKMARKET_USERNAME}:${process.env.BACKMARKET_PASSWORD}`).toString('base64'),
         password: process.env.BACKMARKET_PASSWORD || '',
         userName: process.env.BACKMARKET_USERNAME || '',
         baseUrl: process.env.BACKMARKET_API_URL || 'https://api.backmarket.com',
@@ -24,7 +25,7 @@ export const config = {
 };
 
 export const BACKMARKET_HEADERS = {
-    Authorization: `Basic ${process.env.BACKMARKET_API_KEY}`,
+    Authorization: `Basic ${config.backmarket.credentials}`,
     Accept: 'application/json',
     'Accept-Language': 'fr-fr',
     'Content-Type': 'application/json',

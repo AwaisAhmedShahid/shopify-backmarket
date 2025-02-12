@@ -22,7 +22,7 @@ export class SyncManager {
   }
   startSync(): void {
     logger.info("Starting sync service");
-
+    this.syncOrders();
     cron.schedule("*/5 * * * *", () => {
       this.syncOrders();
       console.log("Executing order sync...");
@@ -71,7 +71,29 @@ export class SyncManager {
           for (const backmarketSku of item.backmarketSkus) {
             await this.backMarketService.updateOrderStatus(
               order.id,
-              "SHIPPED",
+              4,
+              order.trackingNumber
+            );
+          }
+        }
+      }
+      if (order.status === "processing" && order.trackingNumber) {
+        for (const item of mappedItems) {
+          for (const backmarketSku of item.backmarketSkus) {
+            await this.backMarketService.updateOrderStatus(
+              order.id,
+              3,
+              order.trackingNumber
+            );
+          }
+        }
+      }
+      if (order.status === "cancelled" && order.trackingNumber) {
+        for (const item of mappedItems) {
+          for (const backmarketSku of item.backmarketSkus) {
+            await this.backMarketService.updateOrderStatus(
+              order.id,
+              7,
               order.trackingNumber
             );
           }
@@ -90,15 +112,8 @@ export class SyncManager {
     try {
       const mappedItems = order.items.map((item) => ({
         ...item,
-        shopifySku: SkuMapper.backMarketToShopify(item.sku),
+        shopifySku: SkuMapper.backMarketToShopifySKU(item.sku),
       }));
-
-      for (const item of mappedItems) {
-        await this.shopifyService.updateInventory(
-          item.shopifySku,
-          item.quantity
-        );
-      }
 
       if (order.status === "shipped" && order.trackingNumber) {
         await this.shopifyService.updateOrderStatus(

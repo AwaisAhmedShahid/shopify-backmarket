@@ -4,6 +4,8 @@ import { Order } from "../models/order.model";
 import logger from "../utils/logger";
 import { backMarketRateLimiter } from "../utils/rate-limiter";
 import { withRetry } from "../utils/retry";
+import { getSimplifiedOrderlineStatus, getSimplifiedOrderStatus } from "../utils/order-mappers";
+import { BackmarketOrder } from "../Types";
 
 export class BackMarketService {
   private static instance: BackMarketService;
@@ -29,17 +31,21 @@ export class BackMarketService {
         `${this.baseUrl}/orders?created_after=${since.toISOString()}`,
         { headers: this.headers }
       );
-      if(response.statusText !== "OK") {
-          logger.error(`Error fetching BackMarket orders: ${response.statusText}`);
-          throw new Error(`Error fetching BackMarket orders: ${response.statusText}`);
+      if (response.statusText !== "OK") {
+        logger.error(
+          `Error fetching BackMarket orders: ${response.statusText}`
+        );
+        throw new Error(
+          `Error fetching BackMarket orders: ${response.statusText}`
+        );
       }
       return response.data.results.map(this.mapBackMarketOrder);
     }, "Fetching BackMarket orders");
   }
 
   async updateOrderStatus(
-    orderId: number,
-    status: string,
+    orderId: string,
+    status: number,
     trackingNumber?: string
   ): Promise<void> {
     return withRetry(async () => {
@@ -47,7 +53,7 @@ export class BackMarketService {
       await axios.put(
         `${this.baseUrl}/orders/${orderId}`,
         {
-          status,
+          state: status,
           tracking_number: trackingNumber,
         },
         { headers: this.headers }
@@ -55,56 +61,30 @@ export class BackMarketService {
     }, `Updating BackMarket order ${orderId}`);
   }
 
-  async updateInventory(sku: string, quantity: number): Promise<void> {
-    return withRetry(async () => {
-      await backMarketRateLimiter.waitForToken("backmarket-api");
-      await axios.put(
-        `${this.baseUrl}/inventory`,
-        {
-          sku,
-          quantity,
-        },
-        { headers: this.headers }
-      );
-    }, `Updating BackMarket inventory for SKU ${sku}`);
-  }
-
-  private mapBackMarketOrder(backMarketOrder: any): Order {
+  private mapBackMarketOrder(backMarketOrder: BackmarketOrder): Order {
     return {
-      id: backMarketOrder.id,
+      id: backMarketOrder.order_id,
       platformId: backMarketOrder.order_id,
       platform: "backmarket",
-      status: this.mapOrderStatus(backMarketOrder.status),
-      items: backMarketOrder.items.map((item: any) => ({
-        sku: item.sku,
+      status: getSimplifiedOrderStatus(backMarketOrder.state),
+      items: backMarketOrder.orderlines.map((item) => ({
+        sku: item.listing.toString(),
         quantity: item.quantity,
-        price: item.price,
+        price: Number(item.price),
+        status: getSimplifiedOrderlineStatus(item.state),
       })),
       trackingNumber: backMarketOrder.tracking_number,
-      customerEmail: backMarketOrder.customer_email,
+      customerEmail: backMarketOrder.billing_address.email,
       shippingAddress: {
-        name: backMarketOrder.shipping_address.name,
-        address1: backMarketOrder.shipping_address.address1,
-        address2: backMarketOrder.shipping_address.address2,
+        name: backMarketOrder.shipping_address.first_name,
+        address1: backMarketOrder.shipping_address.street,
+        address2: backMarketOrder.shipping_address.street2,
         city: backMarketOrder.shipping_address.city,
         country: backMarketOrder.shipping_address.country,
         postalCode: backMarketOrder.shipping_address.postal_code,
       },
-      createdAt: new Date(backMarketOrder.created_at),
-      updatedAt: new Date(backMarketOrder.updated_at),
+      createdAt: new Date(backMarketOrder.date_creation),
+      updatedAt: new Date(backMarketOrder.date_modification),
     };
-  }
-
-  private mapOrderStatus(status: string): Order["status"] {
-    switch (status) {
-      case "SHIPPED":
-        return "shipped";
-      case "NEW":
-        return "new";
-      case "CANCELLED":
-        return "cancelled";
-      default:
-        return "processing";
-    }
   }
 }

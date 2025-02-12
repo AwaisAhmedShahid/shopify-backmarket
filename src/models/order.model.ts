@@ -2,10 +2,11 @@ export interface OrderItem {
     sku: string;
     quantity: number;
     price: number;
+    status: 'new' | 'processing' | 'shipped' | 'cancelled';
 }
 
 export interface Order {
-    id: number;
+    id: string;
     platformId: string;
     platform: 'shopify' | 'backmarket';
     status: 'new' | 'processing' | 'shipped' | 'cancelled';

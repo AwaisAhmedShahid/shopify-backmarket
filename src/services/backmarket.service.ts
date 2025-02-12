@@ -28,7 +28,7 @@ export class BackMarketService {
     return withRetry(async () => {
       await backMarketRateLimiter.waitForToken("backmarket-api");
       const response = await axios.get(
-        `${this.baseUrl}/orders?created_after=${since.toISOString()}`,
+        `${this.baseUrl}/ws/orders?created_after=${since.toISOString()}`,
         { headers: this.headers }
       );
       if (response.statusText !== "OK") {
@@ -51,7 +51,7 @@ export class BackMarketService {
     return withRetry(async () => {
       await backMarketRateLimiter.waitForToken("backmarket-api");
       await axios.put(
-        `${this.baseUrl}/orders/${orderId}`,
+        `${this.baseUrl}/ws/orders/${orderId}`,
         {
           state: status,
           tracking_number: trackingNumber,

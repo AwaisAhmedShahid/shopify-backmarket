@@ -14,7 +14,7 @@ export const config = {
         credentials: Buffer.from(`${process.env.BACKMARKET_USERNAME}:${process.env.BACKMARKET_PASSWORD}`).toString('base64'),
         password: process.env.BACKMARKET_PASSWORD || '',
         userName: process.env.BACKMARKET_USERNAME || '',
-        baseUrl: process.env.BACKMARKET_API_URL || 'https://api.backmarket.com',
+        baseUrl: process.env.BACKMARKET_API_URL || 'https://preprod.backmarket.fr',
         pollInterval: 5 * 60 * 1000, // 5 minutes
     },
     retryAttempts: 3,

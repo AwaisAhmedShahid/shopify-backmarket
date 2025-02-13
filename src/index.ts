@@ -12,22 +12,22 @@ const app = express();
 app.use(express.json());
 
 // Initialize sync manager
-const syncManager = new SyncManager();
-syncManager.startSync();
+// const syncManager = new SyncManager();
+// syncManager.startSync();
 
-// Health check endpoint with sync status
-app.get("/", (req, res) => {
-  const store = MemoryStore.getInstance();
-  const failedImports = store.getFailedImports();
+// // Health check endpoint with sync status
+// app.get("/", (req, res) => {
+//   const store = MemoryStore.getInstance();
+//   const failedImports = store.getFailedImports();
 
-  res.status(200).json({
-    status: "healthy",
-    failedImports: failedImports.length,
-    failedImportIds: failedImports,
-    lastSyncTime: syncManager.getLastSyncTime(),
-    version: "1.0.0",
-  });
-});
+//   res.status(200).json({
+//     status: "healthy",
+//     failedImports: failedImports.length,
+//     failedImportIds: failedImports,
+//     lastSyncTime: syncManager.getLastSyncTime(),
+//     version: "1.0.0",
+//   });
+// });
 
 // Sync Inventory
 app.post("/inventory/hook", async (req, res) => {

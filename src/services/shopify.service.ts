@@ -48,7 +48,7 @@ export class ShopifyService {
   async createOrder(order: Order): Promise<void> {
     return withRetry(async () => {
       await shopifyRateLimiter.waitForToken("shopify-api");
-      await this.shopify.order.create(order);
+      await this.shopify.draftOrder.create(order);
     }, `Creating Shopify order ${order.id}`);
   }
 
